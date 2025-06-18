@@ -1,125 +1,106 @@
+// import 'package:flutter/material.dart';
+// import 'package:supabase_flutter/supabase_flutter.dart';
+
+// import '../controller/auth_controller.dart';
+
+// class ProfileScreen extends StatelessWidget {
+//   const ProfileScreen({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final user = Supabase.instance.client.auth.currentUser;
+
+//     return Scaffold(
+//       appBar: AppBar(
+//         leading: IconButton(onPressed: () {}, icon: Icon(Icons.arrow_back_ios)),
+//         centerTitle: true,
+//         title: const Text("Profile"),
+//         actions: [
+//           IconButton(
+//             icon: const Icon(Icons.logout),
+//             onPressed: () => AuthController.to.signOut(),
+//           ),
+//         ],
+//       ),
+//       body: Center(
+//         child:
+//             user == null
+//                 ? const Text("No user found")
+//                 : Column(
+//                   mainAxisAlignment: MainAxisAlignment.center,
+//                   children: [
+//                     Text("Email: ${user.email}"),
+//                     Text("Email: ${user.phone}"),
+//                     Text("Email: ${user.phone}"),
+//                     Text("Email: ${user.email}"),
+//                     Text("Email: ${user.email}"),
+//                     Text("Email: ${user.email}"),
+//                     const SizedBox(height: 20),
+//                     ElevatedButton(
+//                       onPressed: () => AuthController.to.signOut(),
+//                       child: const Text("Logout"),
+//                     ),
+//                   ],
+//                 ),
+//       ),
+//     );
+//   }
+// }
+
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class Profile extends StatefulWidget {
-  const Profile({super.key});
+import '../controller/auth_controller.dart';
+import '../controller/profile_controller.dart';
 
-  @override
-  State<Profile> createState() => _ProfileState();
-}
-
-class _ProfileState extends State<Profile> {
-  var _loading = true;
-  final _usernameController = TextEditingController();
-  final _websiteController = TextEditingController();
-
-  @override
-  void initState() {
-    _loadProfile();
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _usernameController.dispose();
-    _websiteController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _loadProfile() async {
-    final ScaffoldMessengerState scaffoldMessenger = ScaffoldMessenger.of(
-      context,
-    );
-    try {
-      final userId = Supabase.instance.client.auth.currentUser!.id;
-      final data =
-          (await Supabase.instance.client.from('profiles').select().match({
-            'id': userId,
-          }).maybeSingle());
-      if (data != null) {
-        setState(() {
-          _usernameController.text = data['username'];
-          _websiteController.text = data['website'];
-        });
-      }
-    } catch (e) {
-      scaffoldMessenger.showSnackBar(
-        const SnackBar(
-          content: Text('Error occurred while getting profile'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-    setState(() {
-      _loading = false;
-    });
-  }
+class ProfileScreen extends StatelessWidget {
+  const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final user = Supabase.instance.client.auth.currentUser;
+    final profileController = Get.put(ProfileController());
+
     return Scaffold(
-      body:
-          _loading
-              ? const Center(child: CircularProgressIndicator())
-              : ListView(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 20,
-                ),
-                children: [
-                  TextFormField(
-                    controller: _usernameController,
-                    decoration: const InputDecoration(label: Text('Username')),
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {},
+          icon: const Icon(Icons.arrow_back_ios),
+        ),
+        centerTitle: true,
+        title: const Text("Profile"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () => AuthController.to.signOut(),
+          ),
+        ],
+      ),
+      body: Obx(() {
+        if (profileController.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        return Center(
+          child:
+              user == null
+                  ? Text("No user found")
+                  : Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("Email: ${user.email}"),
+                      Text("Username: ${profileController.usernameController}"),
+                      Text("Website: ${profileController.usernameController}"),
+                      const SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: () => AuthController.to.signOut(),
+                        child: const Text("Logout"),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _websiteController,
-                    decoration: const InputDecoration(label: Text('Website')),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () async {
-                      final ScaffoldMessengerState scaffoldMessenger =
-                          ScaffoldMessenger.of(context);
-                      try {
-                        setState(() {
-                          _loading = true;
-                        });
-                        final userId =
-                            Supabase.instance.client.auth.currentUser!.id;
-                        final username = _usernameController.text;
-                        final website = _websiteController.text;
-                        await Supabase.instance.client.from('profiles').upsert({
-                          'id': userId,
-                          'username': username,
-                          'website': website,
-                        });
-                        if (mounted) {
-                          scaffoldMessenger.showSnackBar(
-                            const SnackBar(content: Text('Saved profile')),
-                          );
-                        }
-                      } catch (e) {
-                        scaffoldMessenger.showSnackBar(
-                          const SnackBar(
-                            content: Text('Error saving profile'),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                      }
-                      setState(() {
-                        _loading = false;
-                      });
-                    },
-                    child: const Text('Save'),
-                  ),
-                  const SizedBox(height: 16),
-                  TextButton(
-                    onPressed: () => Supabase.instance.client.auth.signOut(),
-                    child: const Text('Sign Out'),
-                  ),
-                ],
-              ),
+        );
+      }),
     );
   }
 }

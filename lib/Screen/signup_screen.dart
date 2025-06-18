@@ -1,129 +1,81 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:get/get.dart';
 
-class SignupScreen extends StatefulWidget {
-  const SignupScreen({super.key});
+import '../controller/auth_controller.dart';
 
-  @override
-  State<SignupScreen> createState() => _SignupScreenState();
-}
+class SignupScreen extends StatelessWidget {
+  final userController = TextEditingController();
+  final nameController = TextEditingController();
+  final phoneController = TextEditingController();
+  final passwordController = TextEditingController();
+  final emailController = TextEditingController();
 
-class _SignupScreenState extends State<SignupScreen> {
-  final _emailController = TextEditingController();
-  final _nameController = TextEditingController();
-  final _phoneController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _userController = TextEditingController();
-
-  bool _loading = false;
+  SignupScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final auth = AuthController.to;
+
     return Scaffold(
-      body:
-          _loading
-              ? const Center(child: CircularProgressIndicator())
-              : ListView(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 20,
-                ),
-                children: [
-                  TextFormField(
-                    keyboardType: TextInputType.name,
-                    controller: _nameController,
-                    decoration: const InputDecoration(label: Text('Full Name')),
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    keyboardType: TextInputType.name,
-                    controller: _userController,
-                    decoration: const InputDecoration(label: Text('User Name')),
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    keyboardType: TextInputType.number,
-                    controller: _phoneController,
-                    decoration: const InputDecoration(label: Text('Phone ')),
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    keyboardType: TextInputType.emailAddress,
-                    controller: _emailController,
-                    decoration: const InputDecoration(label: Text('Email')),
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    obscureText: true,
-                    controller: _passwordController,
-                    decoration: const InputDecoration(label: Text('Password')),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () async {
-                      setState(() => _loading = true);
-                      final scaffoldMessenger = ScaffoldMessenger.of(context);
-                      try {
-                        final email = _emailController.text;
-                        final password = _passwordController.text;
-                        await Supabase.instance.client.auth.signInWithPassword(
-                          email: email,
-                          password: password,
-                        );
-                        scaffoldMessenger.showSnackBar(
-                          const SnackBar(
-                            content: Text('Login successful'),
-                            backgroundColor: Colors.green,
-                          ),
-                        );
-                      } catch (e) {
-                        scaffoldMessenger.showSnackBar(
-                          const SnackBar(
-                            content: Text('Login failed'),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                      } finally {
-                        setState(() => _loading = false);
-                      }
-                    },
-                    child: const Text('Login'),
-                  ),
-                  const SizedBox(height: 16),
-                  TextButton(
-                    onPressed: () async {
-                      setState(() => _loading = true);
-                      final scaffoldMessenger = ScaffoldMessenger.of(context);
-                      try {
-                        final email = _emailController.text;
-                        final password = _passwordController.text;
-                        await Supabase.instance.client.auth.signUp(
-                          email: email,
-                          password: password,
-                        );
-                        scaffoldMessenger.showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              'Signup successful. Check your email.',
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {
+            Get.back();
+          },
+          icon: Icon(Icons.arrow_back_ios),
+        ),
+        centerTitle: true,
+        title: const Text("Signup"),
+      ),
+      body: Obx(
+        () =>
+            auth.isLoading.value
+                ? const Center(child: CircularProgressIndicator())
+                : Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      TextField(
+                        controller: nameController,
+                        decoration: const InputDecoration(
+                          labelText: "Full Name",
+                        ),
+                      ),
+
+                      TextField(
+                        controller: userController,
+                        decoration: const InputDecoration(labelText: "User"),
+                      ),
+                      TextField(
+                        controller: phoneController,
+                        decoration: const InputDecoration(labelText: "Phone"),
+                      ),
+                      TextField(
+                        controller: emailController,
+                        decoration: const InputDecoration(labelText: "Email"),
+                      ),
+
+                      TextField(
+                        controller: passwordController,
+                        obscureText: true,
+                        decoration: const InputDecoration(
+                          labelText: "Password",
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+
+                      ElevatedButton(
+                        onPressed:
+                            () => auth.signUp(
+                              emailController.text,
+                              passwordController.text,
                             ),
-                            backgroundColor: Colors.green,
-                          ),
-                        );
-                      } catch (e) {
-                        scaffoldMessenger.showSnackBar(
-                          const SnackBar(
-                            content: Text('Signup failed'),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                      } finally {
-                        setState(() => _loading = false);
-                      }
-                    },
-                    child: const Text('Signup'),
+                        child: const Text("Signup"),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+      ),
     );
   }
 }

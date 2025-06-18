@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:supabase_frist_project/Screen/home_page.dart';
+import 'package:supabase_frist_project/Screen/login_form.dart';
+import 'package:supabase_frist_project/Screen/profile.dart';
+import 'package:supabase_frist_project/Screen/signup_screen.dart';
+import 'package:supabase_frist_project/controller/auth_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -10,21 +14,19 @@ void main() async {
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNuZGVkbWJtemNkZWRzdGNpYXN6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAwNzQ4MTcsImV4cCI6MjA2NTY1MDgxN30.0-kJ6l0GifH1g7i0zLdnpPww5R5GCKq5diZEGUIlzjI',
   );
 
-  runApp(const MyApp());
-}
+  Get.put(AuthController());
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  runApp(
+    GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Supabase Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: HomePage(),
-    );
-  }
+
+      initialRoute: '/login',
+      // initialRoute: '/signup',
+      getPages: [
+        GetPage(name: '/login', page: () => LoginScreen()),
+        GetPage(name: '/signup', page: () => SignupScreen()),
+        GetPage(name: '/profile', page: () => ProfileScreen()),
+      ],
+    ),
+  );
 }
