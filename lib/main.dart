@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:supabase_frist_project/Screen/login_form.dart';
+import 'package:supabase_frist_project/Screen/phone_login.dart';
+import 'package:supabase_frist_project/Screen/phone_otp.dart';
 import 'package:supabase_frist_project/Screen/profile.dart';
 import 'package:supabase_frist_project/Screen/signup_screen.dart';
 import 'package:supabase_frist_project/controller/auth_controller.dart';
@@ -26,6 +28,8 @@ void main() async {
         GetPage(name: '/login', page: () => LoginScreen()),
         GetPage(name: '/signup', page: () => SignupScreen()),
         GetPage(name: '/profile', page: () => ProfileScreen()),
+        GetPage(name: '/phonelogin', page: () => PhoneLoginScreen()),
+        GetPage(name: '/phone', page: () => PhoneOtp()),
       ],
     ),
   );
