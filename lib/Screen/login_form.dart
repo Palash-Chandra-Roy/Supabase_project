@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:supabase_frist_project/Controller/google_controller.dart';
 
 import '../controller/auth_controller.dart';
 
 class LoginScreen extends StatelessWidget {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  final contactController = Get.put(GoogleController());
 
   LoginScreen({super.key});
 
@@ -58,6 +60,13 @@ class LoginScreen extends StatelessWidget {
                           Get.toNamed('/signup');
                         },
                         child: const Text(" Sign up"),
+                      ),
+
+                      ElevatedButton(
+                        onPressed: () {
+                          Obx(() => Text(contactController.contactText.value));
+                        },
+                        child: Text("Google Sign In"),
                       ),
                     ],
                   ),
