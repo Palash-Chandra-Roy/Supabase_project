@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:supabase_frist_project/Screen/profile.dart';
 
 class AuthController extends GetxController {
   static AuthController get to => Get.find();
+
   final phoneController = TextEditingController();
   final otpController = TextEditingController();
 
@@ -11,10 +14,13 @@ class AuthController extends GetxController {
   var isVerifying = false.obs;
   var phone = ''.obs;
 
+  final supabase = Supabase.instance.client;
+
+  /// Sign up with email & password
   Future<void> signUp(String email, String password) async {
     isLoading.value = true;
     try {
-      final response = await Supabase.instance.client.auth.signUp(
+      final response = await supabase.auth.signUp(
         email: email,
         password: password,
       );
@@ -30,7 +36,7 @@ class AuthController extends GetxController {
       } else {
         Get.snackbar(
           'Email Verification Required',
-          'Check your email to confirm signup',
+          'Check your email',
           backgroundColor: Colors.orange,
           colorText: Colors.white,
         );
@@ -47,16 +53,14 @@ class AuthController extends GetxController {
     }
   }
 
+  /// Sign in with email & password
   Future<void> signIn(String email, String password) async {
     isLoading.value = true;
     try {
-      final response = await Supabase.instance.client.auth.signInWithPassword(
+      final response = await supabase.auth.signInWithPassword(
         email: email,
         password: password,
       );
-
-      print("✅ User: ${response.user}");
-      print("✅ Session: ${response.session}");
 
       if (response.user != null) {
         Get.snackbar(
@@ -65,13 +69,9 @@ class AuthController extends GetxController {
           backgroundColor: Colors.green,
           colorText: Colors.white,
         );
-
-        // Redirect to Profile screen
         Get.offAllNamed('/profile');
       }
     } catch (e) {
-      print("❌ Login Error: $e");
-
       Get.snackbar(
         'Login Failed',
         e.toString(),
@@ -83,13 +83,13 @@ class AuthController extends GetxController {
     }
   }
 
+  /// Sign out the user
   Future<void> signOut() async {
-    await Supabase.instance.client.auth.signOut();
+    await supabase.auth.signOut();
     Get.offAllNamed('/login');
   }
 
-  final supabase = Supabase.instance.client;
-
+  /// Send OTP to phone number
   Future<void> sendOtp() async {
     isLoading.value = true;
     try {
@@ -110,6 +110,7 @@ class AuthController extends GetxController {
     }
   }
 
+  /// Verify OTP code for phone login
   Future<void> verifyOtp() async {
     isVerifying.value = true;
     try {
@@ -139,6 +140,33 @@ class AuthController extends GetxController {
       );
     } finally {
       isVerifying.value = false;
+    }
+  }
+
+  /// Google Sign-In Integration
+  final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
+
+  Future<void> signInWithGoogle() async {
+    try {
+      isLoading(true);
+      final googleUser = await _googleSignIn.signIn();
+      if (googleUser == null) return;
+      final googleAuth = await googleUser.authentication;
+
+      final response = await supabase.auth.signInWithIdToken(
+        provider: OAuthProvider.google,
+        idToken: googleAuth.idToken!,
+      );
+
+      if (response.user != null) {
+        Get.off(() => ProfileScreen());
+      } else {
+        Get.snackbar('Error', 'Google sign-in failed');
+      }
+    } catch (e) {
+      Get.snackbar('Error', e.toString());
+    } finally {
+      isLoading(false);
     }
   }
 

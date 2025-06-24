@@ -26,51 +26,54 @@ class LoginScreen extends StatelessWidget {
         centerTitle: true,
         title: const Text("Login"),
       ),
-      body: Obx(
-        () =>
-            auth.isLoading.value
-                ? const Center(child: CircularProgressIndicator())
-                : Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      TextField(
-                        controller: emailController,
-                        decoration: const InputDecoration(labelText: "Email"),
-                      ),
-                      TextField(
-                        controller: passwordController,
-                        obscureText: true,
-                        decoration: const InputDecoration(
-                          labelText: "Password",
+      body: SingleChildScrollView(
+        child: Obx(
+          () =>
+              auth.isLoading.value
+                  ? const Center(child: CircularProgressIndicator())
+                  : Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        TextField(
+                          controller: emailController,
+                          decoration: const InputDecoration(labelText: "Email"),
                         ),
-                      ),
-                      const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed:
-                            () => auth.signIn(
-                              emailController.text,
-                              passwordController.text,
-                            ),
-                        child: const Text("Login"),
-                      ),
-                      const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: () {
-                          Get.toNamed('/signup');
-                        },
-                        child: const Text(" Sign up"),
-                      ),
+                        TextField(
+                          controller: passwordController,
+                          obscureText: true,
+                          decoration: const InputDecoration(
+                            labelText: "Password",
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        ElevatedButton(
+                          onPressed:
+                              () => auth.signIn(
+                                emailController.text,
+                                passwordController.text,
+                              ),
+                          child: const Text("Login"),
+                        ),
+                        const SizedBox(height: 20),
+                        ElevatedButton(
+                          onPressed: () {
+                            Get.toNamed('/signup');
+                          },
+                          child: const Text(" Sign up"),
+                        ),
 
-                      ElevatedButton(
-                        onPressed: () {
-                          Obx(() => Text(contactController.contactText.value));
-                        },
-                        child: Text("Google Sign In"),
-                      ),
-                    ],
+                        ElevatedButton(
+                          onPressed:
+                              () =>
+                                  Get.find<GoogleController>()
+                                      .signInWithGoogle(),
+                          child: Text('Sign in with Google'),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
+        ),
       ),
     );
   }
