@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:supabase_frist_project/Controller/facebook_controller.dart';
 import 'package:supabase_frist_project/Controller/google_controller.dart';
 
 import '../controller/auth_controller.dart';
@@ -8,6 +9,7 @@ class LoginScreen extends StatelessWidget {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final contactController = Get.put(GoogleController());
+  final facebookController = Get.put(FacebookAuthController());
 
   LoginScreen({super.key});
 
@@ -69,6 +71,14 @@ class LoginScreen extends StatelessWidget {
                                   Get.find<GoogleController>()
                                       .signInWithGoogle(),
                           child: Text('Sign in with Google'),
+                        ),
+
+                        ElevatedButton(
+                          onPressed:
+                              () =>
+                                  Get.find<FacebookAuthController>()
+                                      .signInWithFacebook(),
+                          child: Text('Sign in with Facebook'),
                         ),
                       ],
                     ),

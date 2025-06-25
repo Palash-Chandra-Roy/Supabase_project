@@ -176,4 +176,6 @@ class AuthController extends GetxController {
     otpController.dispose();
     super.onClose();
   }
+
+  //Sign in facebook auth in flutter ;
 }
